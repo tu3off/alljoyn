@@ -8,8 +8,13 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ListView;
 
-import org.alljoyn.bus.*;
+import org.alljoyn.bus.AboutListener;
+import org.alljoyn.bus.AboutObjectDescription;
+import org.alljoyn.bus.BusAttachment;
+import org.alljoyn.bus.BusListener;
+import org.alljoyn.bus.Variant;
 import org.alljoyn.bus.alljoyn.DaemonInit;
 
 import java.util.Map;
@@ -22,11 +27,15 @@ public class DashboardActivity extends AppCompatActivity {
 
     private Handler busHandler;
     private BusAttachment bus;
+    private DeviceAdapter deviceAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        ListView lvDevices = (ListView) findViewById(R.id.lvDevices);
+        deviceAdapter = new DeviceAdapter(getApplicationContext());
+        lvDevices.setAdapter(deviceAdapter);
         HandlerThread busThread = new HandlerThread("BusHandlerThread");
         busThread.start();
         busHandler = new BusHandler(busThread.getLooper(), this);
@@ -98,23 +107,6 @@ public class DashboardActivity extends AppCompatActivity {
             Log.d("MyAboutListener", "version:" + version);
             Log.d("MyAboutListener", "port:" + port);
 
-            SessionOpts sessionOpts = new SessionOpts();
-            sessionOpts.traffic = SessionOpts.TRAFFIC_MESSAGES;
-            sessionOpts.isMultipoint = true;
-            sessionOpts.proximity = SessionOpts.PROXIMITY_ANY;
-            sessionOpts.transports = SessionOpts.TRANSPORT_ANY;
-            final Mutable.ShortValue sPort = new Mutable.ShortValue(port);
-            bus.bindSessionPort(sPort,sessionOpts,new SessionPortListener(){
-                @Override
-                public boolean acceptSessionJoiner(short i, String s, SessionOpts sessionOpts) {
-                    return super.acceptSessionJoiner(i, s, sessionOpts);
-                }
-
-                @Override
-                public void sessionJoined(short i, int i1, String s) {
-                    super.sessionJoined(i, i1, s);
-                }
-            });
         }
     }
 }
