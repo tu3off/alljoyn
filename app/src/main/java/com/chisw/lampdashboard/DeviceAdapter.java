@@ -1,17 +1,17 @@
 package com.chisw.lampdashboard;
 
 import android.content.Context;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class DeviceAdapter extends BaseAdapter {
-    private final List<Device> devices = new ArrayList<>();
+    private final Map<String, Device> devices = new ArrayMap<>();
     private final LayoutInflater layoutInflater;
 
     public DeviceAdapter(Context context) {
@@ -19,7 +19,8 @@ public class DeviceAdapter extends BaseAdapter {
     }
 
     public void add(Device device) {
-        devices.add(device);
+        String key = device.getFriendlyName() + device.getPort();
+        devices.put(key, device);
         notifyDataSetChanged();
     }
 
@@ -30,7 +31,7 @@ public class DeviceAdapter extends BaseAdapter {
 
     @Override
     public Device getItem(int position) {
-        return devices.get(position);
+        return devices.values().toArray(new Device[getCount()])[position];
     }
 
     @Override
